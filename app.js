@@ -1,9 +1,9 @@
 import express from "express";
 
 // Works fine 
-var fs = require('fs');
-var http = require('http');
-var https = require('https');
+import fs from 'fs'
+import http from 'http';
+import https from'https';
 var privateKey  = fs.readFileSync('localhost.key', 'utf8');
 var certificate = fs.readFileSync('localhost.crt', 'utf8');
 var options = {
@@ -12,10 +12,10 @@ var options = {
   };
 import expressGraphQL from "express-graphql";
 import mongoose from "mongoose";
-
-import bodyParser from "body-parser";
 import cors from "cors";
 import schema from "./schema";
+import routes from './home'
+
 
 const app = express();
 const PORT = process.env.PORT || "4000";
@@ -38,11 +38,15 @@ mongoose
 app.use(
   "/graphql",
   cors(),
-  bodyParser.json(),
+  
   expressGraphQL({
     schema,
     graphiql: true
   })
 );
-var server = https.createServer(options, app);
-server.listen(PORT, () => console.log(`Server running on 🔥  port ${PORT}`));
+
+app.use(routes)
+var httpsServer = https.createServer(options, app);
+var httpServer = http.createServer(options, app);
+httpServer.listen(80, () => console.log(`Server http running on 🔥  port 80`));
+httpsServer.listen(PORT, () => console.log(`Server https running on 🔥  port ${PORT}`));
